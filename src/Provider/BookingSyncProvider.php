@@ -13,6 +13,13 @@ class BookingSyncProvider extends AbstractProvider
     use BearerAuthorizationTrait;
 
     protected $version = 'v3';
+    protected $scopes;
+
+    public function __construct(array $options = [], array $collaborators = [])
+    {
+        parent::__construct($options, $collaborators);
+        $this->scopes = $options['scopes'];
+    }
 
     /**
      * Returns the base URL for authorizing a client.
@@ -93,6 +100,24 @@ class BookingSyncProvider extends AbstractProvider
         return ' ';
     }
 
+    /**
+     * Builds the authorization URL.
+     *
+     * @param  array $options
+     * @return string Authorization URL
+     */
+    public function getAuthorizationUrl(array $options = [])
+    {
+        if(isset($this->scopes)) {
+            $options['scope'] = $this->scopes;
+        }
+
+        $base   = $this->getBaseAuthorizationUrl();
+        $params = $this->getAuthorizationParameters($options);
+        $query  = $this->getAuthorizationQuery($params);
+
+        return $this->appendQuery($base, $query);
+    }
 
     /**
      * Generates a resource owner object from a successful resource owner
