@@ -62,4 +62,14 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     {
         return $this->response['business_name'];
     }
+
+    /**
+     * Return the status of the authorized resource owner.
+     *
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->response['status'];
+    }
 }
