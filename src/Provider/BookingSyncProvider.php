@@ -86,9 +86,9 @@ class BookingSyncProvider extends AbstractProvider
     {
         if ($response->getStatusCode() >= 400) {
             throw new IdentityProviderException(
-                $data['errors'] ?: $response->getReasonPhrase(),
+                isset($data['errors']) ? var_export($data['errors']) : $data['error'] ?? $response->getReasonPhrase(),
                 $response->getStatusCode(),
-                $response
+                $response->getBody()
             );
         }
     }
