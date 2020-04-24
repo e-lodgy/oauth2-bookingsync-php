@@ -14,6 +14,7 @@ class BookingSyncProvider extends AbstractProvider
 
     protected $version = 'v3';
     protected $scope = [];
+    protected $accountId;
 
     public function __construct(array $options = [], array $collaborators = [])
     {
@@ -114,6 +115,9 @@ class BookingSyncProvider extends AbstractProvider
         if(isset($this->scope) AND empty($options['scope'])) {
             $options['scope'] = $this->scope;
         }
+
+        if(isset($this->accountId)) {
+            $options['account_id'] = $this->accountId;
         }
 
         $base   = $this->getBaseAuthorizationUrl();
@@ -121,6 +125,11 @@ class BookingSyncProvider extends AbstractProvider
         $query  = $this->getAuthorizationQuery($params);
 
         return $this->appendQuery($base, $query);
+    }
+
+    public function setAccountId(int $id)
+    {
+        $this->accountId = $id;
     }
 
     /**
