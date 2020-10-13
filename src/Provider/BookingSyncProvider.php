@@ -4,6 +4,7 @@ namespace Bookingsync\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -81,11 +82,8 @@ class BookingSyncProvider extends AbstractProvider
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        if ($response->getStatusCode() >= 400 OR isset($data['error'])) {
-            // Set message
-            $error = $data['errors'] ?? $data['error'] ?? null;
-            $message = $error ? json_encode($error) : $response->getReasonPhrase();
-
+        if ($response->getStatusCode() >= 400) {
+            $message = is_string($data) ? $data : (json_encode($data) ?: $response->getReasonPhrase());
             throw new IdentityProviderException($message, $response->getStatusCode(), $data);
         }
     }
