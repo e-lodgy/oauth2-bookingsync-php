@@ -1,24 +1,19 @@
 <?php namespace Bookingsync\OAuth2\Client\Test\Provider;
 
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
-class BookingsyncTest extends \PHPUnit_Framework_TestCase
+class BookingsyncTest extends TestCase
 {
     protected $provider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
             'clientId' => 'mock_client_id',
             'clientSecret' => 'mock_secret',
             'redirectUri' => 'none',
         ]);
-    }
-
-    public function tearDown()
-    {
-        m::close();
-        parent::tearDown();
     }
 
     public function testAuthorizationUrl()
