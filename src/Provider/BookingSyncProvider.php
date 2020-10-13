@@ -81,12 +81,12 @@ class BookingSyncProvider extends AbstractProvider
      */
     protected function checkResponse(ResponseInterface $response, $data)
     {
-        if ($response->getStatusCode() >= 400) {
-            throw new IdentityProviderException(
-                isset($data['errors']) ? var_export($data['errors']) : $data['error'] ?? $response->getReasonPhrase(),
-                $response->getStatusCode(),
-                $response->getBody()
-            );
+        if ($response->getStatusCode() >= 400 OR isset($data['error'])) {
+            // Set message
+            $error = $data['errors'] ?? $data['error'] ?? null;
+            $message = $error ? json_encode($error) : $response->getReasonPhrase();
+
+            throw new IdentityProviderException($message, $response->getStatusCode(), $data);
         }
     }
 
