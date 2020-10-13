@@ -4,6 +4,7 @@ namespace Bookingsync\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -12,6 +13,14 @@ class BookingSyncProvider extends AbstractProvider
 {
     use BearerAuthorizationTrait;
 
+    /**
+     * @var string
+     */
+    const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'uid';
+
+    /**
+     * @var string The version of the API.
+     */
     protected $version = 'v3';
 
     /**
@@ -34,7 +43,7 @@ class BookingSyncProvider extends AbstractProvider
      * @param array $params
      * @return string
      */
-    public function getBaseAccessTokenUrl(array $params)
+    public function getBaseAccessTokenUrl(array $params = [])
     {
         return 'https://www.bookingsync.com/oauth/token';
     }
@@ -74,11 +83,8 @@ class BookingSyncProvider extends AbstractProvider
     protected function checkResponse(ResponseInterface $response, $data)
     {
         if ($response->getStatusCode() >= 400) {
-            throw new IdentityProviderException(
-                isset($data['errors']) ? var_export($data['errors']) : $data['error'] ?? $response->getReasonPhrase(),
-                $response->getStatusCode(),
-                $response->getBody()
-            );
+            $message = is_string($data) ? $data : (json_encode($data) ?: $response->getReasonPhrase());
+            throw new IdentityProviderException($message, $response->getStatusCode(), $data);
         }
     }
 

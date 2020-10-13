@@ -7,14 +7,14 @@ use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 class BookingSyncResourceOwner implements ResourceOwnerInterface
 {
     /**
-     * Raw response
+     * Raw response.
      *
      * @var array
      */
     protected $response;
 
     /**
-     * Set response
+     * Set response.
      *
      * @param array $response
      */
