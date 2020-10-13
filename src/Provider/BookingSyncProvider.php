@@ -12,6 +12,14 @@ class BookingSyncProvider extends AbstractProvider
 {
     use BearerAuthorizationTrait;
 
+    /**
+     * @var string
+     */
+    const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'uid';
+
+    /**
+     * @var string The version of the API.
+     */
     protected $version = 'v3';
 
     /**
