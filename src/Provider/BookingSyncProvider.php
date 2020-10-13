@@ -42,7 +42,7 @@ class BookingSyncProvider extends AbstractProvider
      * @param array $params
      * @return string
      */
-    public function getBaseAccessTokenUrl(array $params)
+    public function getBaseAccessTokenUrl(array $params = [])
     {
         return 'https://www.bookingsync.com/oauth/token';
     }
