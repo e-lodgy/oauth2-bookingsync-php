@@ -13,7 +13,7 @@ class BookingsyncTest extends TestCase
 {
     protected $provider;
 
-    protected function setUp(): void
+    protected function setUp()
     {
         $this->provider = new BookingSyncProvider([
             'clientId' => 'mock_client_id',
