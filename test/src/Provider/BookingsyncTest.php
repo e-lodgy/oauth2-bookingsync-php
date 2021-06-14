@@ -4,6 +4,7 @@ namespace Bookingsync\OAuth2\Client\Test\Provider;
 
 use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
 use GuzzleHttp\ClientInterface;
+use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -11,20 +12,33 @@ use Psr\Http\Message\ResponseInterface;
 
 class BookingsyncTest extends TestCase
 {
-    protected $provider;
+    /**
+     * @var BookingSyncProvider
+     */
+    private $provider;
 
-    protected function setUp()
+    /**
+     * @return BookingSyncProvider
+     */
+    private function getProvider()
     {
-        $this->provider = new BookingSyncProvider([
+        if (null !== $this->provider) {
+            return $this->provider;
+        }
+
+        return $this->provider = new BookingSyncProvider([
             'clientId' => 'mock_client_id',
             'clientSecret' => 'mock_secret',
             'redirectUri' => 'none',
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function testGetAuthorizationUrl()
     {
-        $url = $this->provider->getAuthorizationUrl();
+        $url = $this->getProvider()->getAuthorizationUrl();
         $uri = parse_url($url);
         parse_str($uri['query'], $query);
 
@@ -34,12 +48,12 @@ class BookingsyncTest extends TestCase
         $this->assertArrayHasKey('scope', $query);
         $this->assertArrayHasKey('response_type', $query);
         $this->assertArrayHasKey('approval_prompt', $query);
-        $this->assertNotNull($this->provider->getState());
+        $this->assertNotNull($this->getProvider()->getState());
     }
 
     public function testGetBaseAuthorizationUrl()
     {
-        $url = $this->provider->getBaseAuthorizationUrl();
+        $url = $this->getProvider()->getBaseAuthorizationUrl();
         $uri = parse_url($url);
 
         $this->assertEquals('/oauth/authorize', $uri['path']);
@@ -47,7 +61,7 @@ class BookingsyncTest extends TestCase
 
     public function testGetBaseAccessTokenUrl()
     {
-        $url = $this->provider->getBaseAccessTokenUrl();
+        $url = $this->getProvider()->getBaseAccessTokenUrl();
         $uri = parse_url($url);
 
         $this->assertEquals('/oauth/token', $uri['path']);
@@ -70,14 +84,14 @@ class BookingsyncTest extends TestCase
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(1);
         $client->shouldReceive('send')->times(1)->andReturn($response);
-        $this->provider->setHttpClient($client);
+        $this->getProvider()->setHttpClient($client);
 
-        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
-        $url = $this->provider->getResourceOwnerDetailsUrl($token);
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $url = $this->getProvider()->getResourceOwnerDetailsUrl($token);
 
         $uri = parse_url($url);
 
-        $this->assertEquals('/api/v3/accounts', $uri['path']);
+        $this->assertEquals('/api/v3/accounts/1', $uri['path']);
     }
 
     public function testGetAccessToken()
@@ -97,9 +111,9 @@ class BookingsyncTest extends TestCase
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(1);
         $client->shouldReceive('send')->times(1)->andReturn($response);
-        $this->provider->setHttpClient($client);
+        $this->getProvider()->setHttpClient($client);
 
-        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
 
         $this->assertEquals('mock_access_token', $token->getToken());
         $this->assertLessThanOrEqual(time() + 3600, $token->getExpires());
@@ -143,15 +157,16 @@ class BookingsyncTest extends TestCase
         $client->shouldReceive('setDefaultOption')->times(4);
         $client->shouldReceive('send')->times(1)->andReturn($postResponse);
         $client->shouldReceive('send')->times(4)->andReturn($getResponse);
-        $this->provider->setHttpClient($client);
+        $this->getProvider()->setHttpClient($client);
 
-        $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
-        $user = $this->provider->getResourceOwner($token);
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+        $user = $this->getProvider()->getResourceOwner($token);
 
         $this->assertEquals('mock_id', $user->getId());
         $this->assertEquals('mock_business_name', $user->getBusinessName());
         $this->assertEquals('mock_email', $user->getEmail());
         $this->assertEquals('mock_status', $user->getStatus());
+        $this->assertSame($token, $user->getAccessToken());
         $this->assertTrue(is_array($user->toArray()));
     }
 
@@ -180,12 +195,12 @@ class BookingsyncTest extends TestCase
             $client->shouldReceive('send')
                 ->times(2)
                 ->andReturn($postResponse, $userResponse);
-            $this->provider->setHttpClient($client);
+            $this->getProvider()->setHttpClient($client);
 
-            $token = $this->provider->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+            $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
 
             try {
-                $user = $this->provider->getResourceOwner($token);
+                $this->getProvider()->getResourceOwner($token);
                 return false;
             } catch (\Exception $e) {
                 $this->assertInstanceOf(IdentityProviderException::class, $e);
