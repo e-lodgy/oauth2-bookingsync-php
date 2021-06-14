@@ -39,6 +39,12 @@ jobs:
         if: steps.composer-update.outcome != 'success'
         run: exit 1
 
+      - name: Set pcov for PHPUnit 5.x, 6.x, 7.x
+        if: ${{ matrix.php }} == 7.1
+        run: |
+          composer require pcov/clobber
+          vendor/bin/pcov clobber
+
       - name: PHPUnit tests
         run: vendor/bin/phpunit --verbose --coverage-clover ./coverage.xml
 
