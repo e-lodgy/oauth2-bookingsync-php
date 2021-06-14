@@ -19,8 +19,8 @@
         "bookingsync"
     ],
     "require": {
-        "league/oauth2-client": "^2.0"
         "php": "^5.6",
+        "league/oauth2-client": "^2.0"
     },
     "require-dev": {
         "mockery/mockery": "~1.3",
