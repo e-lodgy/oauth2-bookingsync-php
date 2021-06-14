@@ -91,7 +91,7 @@ class BookingsyncTest extends TestCase
 
         $uri = parse_url($url);
 
-        $this->assertEquals('/api/v3/accounts/1', $uri['path']);
+        $this->assertEquals('/api/v3/accounts', $uri['path']);
     }
 
     public function testGetAccessToken()
@@ -166,7 +166,6 @@ class BookingsyncTest extends TestCase
         $this->assertEquals('mock_business_name', $user->getBusinessName());
         $this->assertEquals('mock_email', $user->getEmail());
         $this->assertEquals('mock_status', $user->getStatus());
-        $this->assertSame($token, $user->getAccessToken());
         $this->assertTrue(is_array($user->toArray()));
     }
 
