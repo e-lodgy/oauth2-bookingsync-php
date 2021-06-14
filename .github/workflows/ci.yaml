@@ -1,0 +1,58 @@
+name: Continuous integration
+
+on:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * 1,2'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0]
+
+    name: PHP ${{ matrix.php }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          coverage: pcov
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        id: composer-update
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Fail the test
+        if: steps.composer-update.outcome != 'success'
+        run: exit 1
+
+      - name: PHPUnit tests
+        run: vendor/bin/phpunit --verbose --coverage-clover ./coverage.xml
+
+      - name: Coverage
+        uses: johanvanhelden/gha-clover-test-coverage-check@v1
+        with:
+          percentage: "100"
+          filename: "coverage.xml"
+
+      - uses: actions/cache@v2
+        with:
+          path: ~/.symfony/cache
+          key: ${{ runner.os }}-php-${{ matrix.php }}
+          restore-keys: ${{ runner.os }}-php-
+
+      - name: The PHP Security Checker
+        uses: symfonycorp/security-checker-action@v2
