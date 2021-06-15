@@ -44,7 +44,7 @@ jobs:
         run: composer info phpunit/phpunit | grep versions
 
       - name: Set pcov for PHPUnit 5.x, 6.x, 7.x
-        if: contains(steps.phpunit-version.outputs, '* 5.') || contains(steps.phpunit-version.outputs, '* 6.') || contains(steps.phpunit-version.outputs, '* 7.')
+        if: ${{ contains(steps.phpunit-version.outputs, '* 5.') || contains(steps.phpunit-version.outputs, '* 6.') || contains(steps.phpunit-version.outputs, '* 7.') }}
         run: |
           composer require pcov/clobber --dev
           vendor/bin/pcov clobber
