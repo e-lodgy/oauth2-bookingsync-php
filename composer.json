@@ -8,6 +8,12 @@
             "email": "dev@bookingsync.com",
             "homepage": "https://github.com/bookingsync",
             "role": "Developer"
+        },
+        {
+            "name": "Benjamin Malgras",
+            "email": "benjamin.malgras@outlook.fr",
+            "homepage": "https://github.com/benjaminmal",
+            "role": "Developer"
         }
     ],
     "keywords": [
