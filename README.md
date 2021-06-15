@@ -8,12 +8,6 @@
 
 This package provides BookingSync OAuth 2.0 support for the PHP League's [OAuth 2.0 Client](https://github.com/thephpleague/oauth2-client).
 
-## Deprecation warning
-
-This lib use old deprecated vendors. You may have an SSL certificate issue. To solve it, you should:
-- Replace the cacert.pem file in the deprecated GuzzleHttp repo with an updated one from https://curl.haxx.se/docs/caextract.html
-- The location of the old pem file is `vendor/guzzle/guzzle/src/Guzzle/Http/Resources/cacert.pem`
-
 ## Installation
 
 To install, use composer:
@@ -29,29 +23,26 @@ Usage is the same as The League's OAuth client, using `\Bookingsync\OAuth2\Clien
 ### Authorization Code Flow
 
 ```php
-$provider = new Bookingsync\OAuth2\Client\Provider\Bookingsync([
+$provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
     'clientId'          => 'XXXXXXXX',
     'clientSecret'      => 'XXXXXXXX',
     'redirectUri'       => 'https://www.example.com/callback-url', // https is mandatory for BookingSync
     'scopes'            => ['public'] // scopes required by your BookingSync application.
 ]);
 
-if (!isset($_GET['code'])) {
-
+if (! isset($_GET['code'])) {
     // If we don't have an authorization code then get one
     $authUrl = $provider->getAuthorizationUrl();
-    $_SESSION['oauth2state'] = $provider->state;
+    $_SESSION['oauth2state'] = $provider->getState();
     header('Location: '.$authUrl);
     exit;
 
 // Check given state against previously stored one to mitigate CSRF attack
 } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
-
     unset($_SESSION['oauth2state']);
     exit('Invalid state');
 
 } else {
-
     // Try to get an access token (using the authorization code grant)
     $token = $provider->getAccessToken('authorization_code', [
         'code' => $_GET['code']
@@ -59,47 +50,66 @@ if (!isset($_GET['code'])) {
 
     // Optional: Now you have a token you can look up a users profile data
     try {
-
-        // We got an access token, let's now get the user's details
-        $userDetails = $provider->getUserDetails($token);
+        // Using the access token, we may look up details about the resource owner.
+        $resourceOwner = $provider->getResourceOwner($accessToken);
 
         // Use these details to create a new profile
-        printf('Hello %s!', $userDetails->screenName);
+        printf('Hello %s!', $resourceOwner->getBusinessName());
 
-    } catch (Exception $e) {
-
+    } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
         // Failed to get user details
-        exit('Oh dear...');
+        exit($e->getMessage());
     }
 
     // Use this to interact with an API on the users behalf
-    echo $token->accessToken;
+    echo $token->getAccessToken();
 
     // Use this to get a new access token if the old one expires
-    echo $token->refreshToken;
+    echo $token->getRefreshToken();
 
     // Unix timestamp of when the token will expire, and need refreshing
-    echo $token->expires;
+    echo $token->getExpires();
 }
 ```
 
 ### Refreshing a Token
 
 ```php
-$provider = new Bookingsync\OAuth2\Client\Provider\Bookingsync([
+$provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
     'clientId'          => '{bookingsync-client-id}',
     'clientSecret'      => '{bookingsync-client-secret}',
     'redirectUri'       => 'https://example.com/callback-url'
 ]);
 
-$grant = new \League\OAuth2\Client\Grant\RefreshToken();
-$token = $provider->getAccessToken($grant, ['refresh_token' => $token->refreshToken]);
+$existingAccessToken = getAccessTokenFromYourDataStore();
+
+if ($existingAccessToken->hasExpired()) {
+    $grant = new \League\OAuth2\Client\Grant\RefreshToken();
+    $token = $provider->getAccessToken($grant, ['refresh_token' => $existingAccessToken->getRefreshToken()]);
+}
+```
+### Client Credentials
+```php
+$provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
+    'clientId'          => '{bookingsync-client-id}',
+    'clientSecret'      => '{bookingsync-client-secret}',
+    'redirectUri'       => 'https://example.com/callback-url'
+]);
+
+try {
+    // Try to get an access token using the client credentials grant.
+    $grant = new \League\OAuth2\Client\Grant\ClientCredentials();
+    $accessToken = $provider->getAccessToken($grant);
+} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+    // Failed to get the access token
+    exit($e->getMessage());
+}
 ```
 
 ## Testing
 
 ```
-phpunit test
+vendor/bin/phpunit
 ```
 
 ## License
