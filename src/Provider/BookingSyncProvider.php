@@ -6,6 +6,7 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Token\ResourceOwnerAccessTokenInterface;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
 
@@ -56,7 +57,9 @@ class BookingSyncProvider extends AbstractProvider
      */
     public function getResourceOwnerDetailsUrl(AccessToken $token)
     {
-        return 'https://www.bookingsync.com/api/'.$this->version.'/accounts';
+        $id = $token instanceof ResourceOwnerAccessTokenInterface ? $token->getResourceOwnerId() : null;
+
+        return 'https://www.bookingsync.com/api/'.$this->version.'/accounts/'.$id;
     }
 
     /**
@@ -109,6 +112,6 @@ class BookingSyncProvider extends AbstractProvider
      */
     protected function createResourceOwner(array $response, AccessToken $token)
     {
-        return new BookingSyncResourceOwner($response['accounts'][0]);
+        return new BookingSyncResourceOwner($response['accounts'][0], $token);
     }
 }

@@ -3,6 +3,7 @@
 namespace Bookingsync\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 
 class BookingSyncResourceOwner implements ResourceOwnerInterface
 {
@@ -14,13 +15,20 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     protected $response;
 
     /**
-     * Set response.
+     * The resource owner's access token.
      *
-     * @param array $response
+     * @var AccessTokenInterface
      */
-    public function __construct(array $response)
+    protected $accessToken;
+
+    /**
+     * @param array $response
+     * @param AccessTokenInterface $accessToken
+     */
+    public function __construct(array $response, AccessTokenInterface $accessToken)
     {
         $this->response = $response;
+        $this->accessToken = $accessToken;
     }
 
     /**
@@ -34,7 +42,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Return all of the owner details available as an array.
+     * Returns all of the owner details available as an array.
      *
      * @return array
      */
@@ -44,7 +52,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Return the email of the authorized resource owner.
+     * Returns the email of the authorized resource owner.
      *
      * @return string
      */
@@ -54,7 +62,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Return the business name of the authorized resource owner.
+     * Returns the business name of the authorized resource owner.
      *
      * @return string
      */
@@ -64,12 +72,20 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     }
 
     /**
-     * Return the status of the authorized resource owner.
+     * Returns the status of the authorized resource owner.
      *
      * @return string
      */
     public function getStatus()
     {
         return $this->response['status'];
+    }
+
+    /**
+     * @return AccessTokenInterface
+     */
+    public function getAccessToken()
+    {
+        return $this->accessToken;
     }
 }
