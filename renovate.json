@@ -1,8 +1,0 @@
-{
-  "extends": [
-    "config:base"
-  ],
-  "updateLockFiles": false,
-  "branchPrefix": "dependencies/",
-  "rangeStrategy": "replace"
-}
