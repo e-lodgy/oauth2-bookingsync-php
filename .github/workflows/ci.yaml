@@ -28,12 +28,15 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           coverage: pcov
 
+      - name: Setup composer
+        run: composer config -g github-oauth.github.com ${{ secrets.PAT }}
+
       - name: Validate composer.json and composer.lock
-        run: composer validate --strict
+        run: composer validate --strict --no-interaction --no-ansi
 
       - name: Install dependencies
         id: composer-update
-        run: composer update --no-interaction --no-progress --prefer-dist
+        run: composer update --no-interaction --no-progress --prefer-dist --no-ansi
 
       - name: Fail the test
         if: steps.composer-update.outcome != 'success'
@@ -47,7 +50,7 @@ jobs:
         if: contains(steps.phpunit-version.outputs.version, '* 5.') || contains(steps.phpunit-version.outputs.version, '* 6.') || contains(steps.phpunit-version.outputs.version, '* 7.')
         continue-on-error: true
         run: |
-          composer require pcov/clobber --dev
+          composer require pcov/clobber --dev --no-progress --no-interaction --no-ansi --prefer-dist
           vendor/bin/pcov clobber
 
       - name: PHPUnit tests
