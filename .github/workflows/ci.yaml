@@ -28,6 +28,9 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip
           coverage: pcov
 
+      - name: Setup composer
+        run: composer config -g github-oauth.github.com ${{ secrets.PAT }}
+
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
 
