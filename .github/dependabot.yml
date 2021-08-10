@@ -17,3 +17,9 @@ updates:
     registries: [ github ]
     allow:
       - dependency-type: all # Direct & indirect updates for all packages
+
+  # GitHub Action
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: daily }
+    open-pull-requests-limit: 10
