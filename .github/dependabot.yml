@@ -1,13 +1,19 @@
-# Composer dependabot file
-
 version: 2
+
+registries:
+  github:
+    type: git
+    url: https://github.com
+    username: x-access-token
+    password: ${{secrets.PAT}}
+
 updates:
-  # Maintain dependencies for Composer
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "daily"
+  # Composer
+  - package-ecosystem: composer
+    directory: /
+    versioning-strategy: widen
+    schedule: { interval: daily }
+    open-pull-requests-limit: 10
+    registries: [ github ]
     allow:
-      # Allow both direct and indirect updates for all packages
-      - dependency-type: "all"
-    versioning-strategy: increase-if-necessary
+      - dependency-type: all # Direct & indirect updates for all packages
