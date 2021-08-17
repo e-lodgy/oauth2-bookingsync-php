@@ -43,7 +43,7 @@ jobs:
         run: exit 1
 
       - name: PHPUnit tests
-        run: 'vendor/bin/phpunit --verbose --color=always --fail-on-incomplete --fail-on-risky --do-not-cache-result --coverage-clover ./coverage.xml'
+        run: 'vendor/bin/phpunit --verbose --color=always --fail-on-risky --coverage-clover ./coverage.xml'
 
       - name: Coverage
         uses: johanvanhelden/gha-clover-test-coverage-check@v1
