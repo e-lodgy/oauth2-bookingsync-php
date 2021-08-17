@@ -25,6 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          tools: symfony
           coverage: xdebug
 
       - name: Setup composer
@@ -56,5 +57,5 @@ jobs:
           key: ${{ runner.os }}-php-${{ matrix.php }}
           restore-keys: ${{ runner.os }}-php-
 
-      - name: The PHP Security Checker
-        uses: symfonycorp/security-checker-action@v2
+      - name: Check for security vulnerabilities
+        run: symfony security:check
