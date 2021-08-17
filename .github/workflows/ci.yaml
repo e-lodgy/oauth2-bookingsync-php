@@ -4,7 +4,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: '0 4 * * 1,2'
+    - cron: '0 4 * * 1,2' # At 4am on Monday & tuesday
 
 jobs:
   build:
@@ -41,17 +41,6 @@ jobs:
       - name: Fail the test
         if: steps.composer-update.outcome != 'success'
         run: exit 1
-
-      - name: Get PHPUnit version
-        id: phpunit-version
-        run: echo "::set-output name=version::$(composer info phpunit/phpunit | grep versions)"
-
-      - name: Set pcov for PHPUnit 5.x, 6.x, 7.x
-        if: contains(steps.phpunit-version.outputs.version, '* 5.') || contains(steps.phpunit-version.outputs.version, '* 6.') || contains(steps.phpunit-version.outputs.version, '* 7.')
-        continue-on-error: true
-        run: |
-          composer require pcov/clobber --dev --no-progress --no-interaction --no-ansi --prefer-dist
-          vendor/bin/pcov clobber
 
       - name: PHPUnit tests
         run: vendor/bin/phpunit --verbose --coverage-clover ./coverage.xml
