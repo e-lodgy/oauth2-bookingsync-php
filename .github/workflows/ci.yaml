@@ -1,10 +1,10 @@
 name: Continuous integration
 
 on:
-  pull_request:
-  workflow_dispatch:
+  pull_request: ~
+  workflow_dispatch: ~
   schedule:
-    - cron: '0 4 * * 1,2'
+    - cron: '0 4 * * 1,2' # At 4am on Monday & tuesday
 
 jobs:
   build:
@@ -25,36 +25,25 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip
-          coverage: pcov
+          tools: symfony
+          coverage: xdebug
 
       - name: Setup composer
-        run: composer config -g github-oauth.github.com ${{ secrets.PAT }}
+        run: 'composer config -g github-oauth.github.com ${{ secrets.PAT }} --verbose --no-interaction --ansi'
 
       - name: Validate composer.json and composer.lock
-        run: composer validate --strict --no-interaction --no-ansi
+        run: 'composer validate --verbose --strict --no-interaction --ansi'
 
       - name: Install dependencies
         id: composer-update
-        run: composer update --no-interaction --no-progress --prefer-dist --no-ansi
+        run: 'composer update --no-interaction --no-progress --prefer-dist --ansi --verbose --no-scripts'
 
       - name: Fail the test
         if: steps.composer-update.outcome != 'success'
         run: exit 1
 
-      - name: Get PHPUnit version
-        id: phpunit-version
-        run: echo "::set-output name=version::$(composer info phpunit/phpunit | grep versions)"
-
-      - name: Set pcov for PHPUnit 5.x, 6.x, 7.x
-        if: contains(steps.phpunit-version.outputs.version, '* 5.') || contains(steps.phpunit-version.outputs.version, '* 6.') || contains(steps.phpunit-version.outputs.version, '* 7.')
-        continue-on-error: true
-        run: |
-          composer require pcov/clobber --dev --no-progress --no-interaction --no-ansi --prefer-dist
-          vendor/bin/pcov clobber
-
       - name: PHPUnit tests
-        run: vendor/bin/phpunit --verbose --coverage-clover ./coverage.xml
+        run: 'vendor/bin/phpunit --verbose --color=always --fail-on-risky --coverage-clover ./coverage.xml'
 
       - name: Coverage
         uses: johanvanhelden/gha-clover-test-coverage-check@v1
@@ -68,5 +57,5 @@ jobs:
           key: ${{ runner.os }}-php-${{ matrix.php }}
           restore-keys: ${{ runner.os }}-php-
 
-      - name: The PHP Security Checker
-        uses: symfonycorp/security-checker-action@v2
+      - name: Check for security vulnerabilities
+        run: 'symfony security:check'
