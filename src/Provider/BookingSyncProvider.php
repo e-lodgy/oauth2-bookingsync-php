@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bookingsync\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
+use League\OAuth2\Client\Token\AccessTokenInterface;
 use League\OAuth2\Client\Token\ResourceOwnerAccessTokenInterface;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -14,24 +17,16 @@ class BookingSyncProvider extends AbstractProvider
 {
     use BearerAuthorizationTrait;
 
-    /**
-     * @var string
-     */
-    const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'uid';
+    public const ACCESS_TOKEN_RESOURCE_OWNER_ID = 'uid';
 
-    /**
-     * @var string The version of the API.
-     */
-    protected $version = 'v3';
+    protected string $version = 'v3';
 
     /**
      * Returns the base URL for authorizing a client.
      *
      * Eg. https://oauth.service.com/authorize
-     *
-     * @return string
      */
-    public function getBaseAuthorizationUrl()
+    public function getBaseAuthorizationUrl(): string
     {
         return 'https://www.bookingsync.com/oauth/authorize';
     }
@@ -40,26 +35,20 @@ class BookingSyncProvider extends AbstractProvider
      * Returns the base URL for requesting an access token.
      *
      * Eg. https://oauth.service.com/token
-     *
-     * @param array $params
-     * @return string
      */
-    public function getBaseAccessTokenUrl(array $params = [])
+    public function getBaseAccessTokenUrl(array $params = []): string
     {
         return 'https://www.bookingsync.com/oauth/token';
     }
 
     /**
      * Returns the URL for requesting the resource owner's details.
-     *
-     * @param AccessToken $token
-     * @return string
      */
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    public function getResourceOwnerDetailsUrl(AccessTokenInterface $token): string
     {
         $id = $token instanceof ResourceOwnerAccessTokenInterface ? $token->getResourceOwnerId() : null;
 
-        return 'https://www.bookingsync.com/api/'.$this->version.'/accounts/'.$id;
+        return 'https://www.bookingsync.com/api/' . $this->version . '/accounts/' . $id;
     }
 
     /**
@@ -67,10 +56,8 @@ class BookingSyncProvider extends AbstractProvider
      *
      * This should only be the scopes that are required to request the details
      * of the resource owner, rather than all the available scopes.
-     *
-     * @return array
      */
-    protected function getDefaultScopes()
+    protected function getDefaultScopes(): array
     {
         return ['public'];
     }
@@ -78,12 +65,11 @@ class BookingSyncProvider extends AbstractProvider
     /**
      * Checks a provider response for errors.
      *
+     * @param array|string $data Parsed response data
+     *
      * @throws IdentityProviderException
-     * @param  ResponseInterface $response
-     * @param  array|string $data Parsed response data
-     * @return void
      */
-    protected function checkResponse(ResponseInterface $response, $data)
+    protected function checkResponse(ResponseInterface $response, $data): void
     {
         if ($response->getStatusCode() >= 400) {
             $message = is_string($data) ? $data : (json_encode($data) ?: $response->getReasonPhrase());
@@ -94,10 +80,8 @@ class BookingSyncProvider extends AbstractProvider
     /**
      * Returns the string that should be used to separate scopes when building
      * the URL for requesting an access token.
-     *
-     * @return string Scope separator, defaults to ','
      */
-    protected function getScopeSeparator()
+    protected function getScopeSeparator(): string
     {
         return ' ';
     }
@@ -105,12 +89,8 @@ class BookingSyncProvider extends AbstractProvider
     /**
      * Generates a resource owner object from a successful resource owner
      * details request.
-     *
-     * @param  array $response
-     * @param  AccessToken $token
-     * @return ResourceOwnerInterface
      */
-    protected function createResourceOwner(array $response, AccessToken $token)
+    protected function createResourceOwner(array $response, AccessToken $token): ResourceOwnerInterface
     {
         return new BookingSyncResourceOwner($response['accounts'][0], $token);
     }
