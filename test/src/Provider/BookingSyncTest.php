@@ -11,7 +11,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
-class BookingsyncTest extends TestCase
+class BookingSyncTest extends TestCase
 {
     private BookingSyncProvider $provider;
 
