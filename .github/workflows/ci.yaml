@@ -42,6 +42,10 @@ jobs:
         if: steps.composer-update.outcome != 'success'
         run: exit 1
 
+
+      - name: ECS check
+        run: 'vendor/bin/ecs check src --no-progress-bar --no-interaction --verbose --ansi'
+
       - name: PHPUnit tests
         run: 'vendor/bin/phpunit --verbose --color=always --fail-on-risky --coverage-clover ./coverage.xml'
 
