@@ -140,7 +140,7 @@ class BookingsyncTest extends TestCase
 
         $accountBody = [
             "accounts" => [[
-                "id" => "mock_id",
+                "id" => 12,
                 "business_name" => "mock_business_name",
                 "email" => "mock_email",
                 "status" => "mock_status"
@@ -162,7 +162,7 @@ class BookingsyncTest extends TestCase
         $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
         $user = $this->getProvider()->getResourceOwner($token);
 
-        $this->assertEquals('mock_id', $user->getId());
+        $this->assertEquals(12, $user->getId());
         $this->assertEquals('mock_business_name', $user->getBusinessName());
         $this->assertEquals('mock_email', $user->getEmail());
         $this->assertEquals('mock_status', $user->getStatus());
