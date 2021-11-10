@@ -1,12 +1,5 @@
 version: 2
 
-registries:
-  github:
-    type: git
-    url: https://github.com
-    username: x-access-token
-    password: ${{secrets.PAT}}
-
 updates:
   # Composer
   - package-ecosystem: composer
@@ -14,7 +7,6 @@ updates:
     versioning-strategy: widen
     schedule: { interval: daily }
     open-pull-requests-limit: 10
-    registries: [ github ]
     allow:
       - dependency-type: all # Direct & indirect updates for all packages
     assignees:
