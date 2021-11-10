@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bookingsync\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
@@ -9,22 +11,14 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
 {
     /**
      * Raw response.
-     *
-     * @var array
      */
-    protected $response;
+    protected array $response;
 
     /**
      * The resource owner's access token.
-     *
-     * @var AccessTokenInterface
      */
-    protected $accessToken;
+    protected AccessTokenInterface $accessToken;
 
-    /**
-     * @param array $response
-     * @param AccessTokenInterface $accessToken
-     */
     public function __construct(array $response, AccessTokenInterface $accessToken)
     {
         $this->response = $response;
@@ -33,58 +27,48 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
 
     /**
      * Returns the identifier of the authorized resource owner.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->response['id'];
     }
 
     /**
-     * Returns all of the owner details available as an array.
-     *
-     * @return array
+     * Returns all the owner details available as an array.
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->response;
     }
 
     /**
      * Returns the email of the authorized resource owner.
-     *
-     * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->response['email'];
     }
 
     /**
      * Returns the business name of the authorized resource owner.
-     *
-     * @return string
      */
-    public function getBusinessName()
+    public function getBusinessName(): string
     {
         return $this->response['business_name'];
     }
 
     /**
      * Returns the status of the authorized resource owner.
-     *
-     * @return string
      */
-    public function getStatus()
+    public function getStatus(): string
     {
         return $this->response['status'];
     }
 
     /**
-     * @return AccessTokenInterface
+     * Return the access token of the authorized resource owner
      */
-    public function getAccessToken()
+    public function getAccessToken(): AccessTokenInterface
     {
         return $this->accessToken;
     }

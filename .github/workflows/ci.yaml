@@ -3,6 +3,8 @@ name: Continuous integration
 on:
   pull_request: ~
   workflow_dispatch: ~
+  release:
+    types: [ created ]
   schedule:
     - cron: '0 4 * * 1,2' # At 4am on Monday & tuesday
 
@@ -13,11 +15,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [5.6, 7.0, 7.1, 7.2, 7.3, 7.4, 8.0]
+        php: [7.4, 8.0]
 
     name: PHP ${{ matrix.php }}
 
     steps:
+
+      # --- ⚙️ Setup ⚙️ ----------
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -31,9 +36,6 @@ jobs:
       - name: Setup composer
         run: 'composer config -g github-oauth.github.com ${{ secrets.PAT }} --verbose --no-interaction --ansi'
 
-      - name: Validate composer.json and composer.lock
-        run: 'composer validate --verbose --strict --no-interaction --ansi'
-
       - name: Install dependencies
         id: composer-update
         run: 'composer update --no-interaction --no-progress --prefer-dist --ansi --verbose --no-scripts'
@@ -41,6 +43,17 @@ jobs:
       - name: Fail the test
         if: steps.composer-update.outcome != 'success'
         run: exit 1
+
+      # --- 🛠 Test 🛠 ----------
+
+      - name: Validate composer.json and composer.lock
+        run: 'composer validate --verbose --strict --no-interaction --ansi'
+
+      - name: PHPStan test
+        run: 'vendor/bin/phpstan analyse --no-progress --no-interaction --verbose --ansi'
+
+      - name: ECS check
+        run: 'vendor/bin/ecs check src --no-progress-bar --no-interaction --verbose --ansi'
 
       - name: PHPUnit tests
         run: 'vendor/bin/phpunit --verbose --color=always --fail-on-risky --coverage-clover ./coverage.xml'

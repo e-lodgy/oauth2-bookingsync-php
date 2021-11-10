@@ -1,42 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bookingsync\OAuth2\Client\Test\Provider;
 
 use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
 use GuzzleHttp\ClientInterface;
-use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 
-class BookingsyncTest extends TestCase
+class BookingSyncTest extends TestCase
 {
-    /**
-     * @var BookingSyncProvider
-     */
-    private $provider;
+    private BookingSyncProvider $provider;
 
-    /**
-     * @return BookingSyncProvider
-     */
-    private function getProvider()
-    {
-        if (null !== $this->provider) {
-            return $this->provider;
-        }
-
-        return $this->provider = new BookingSyncProvider([
-            'clientId' => 'mock_client_id',
-            'clientSecret' => 'mock_secret',
-            'redirectUri' => 'none',
-        ]);
-    }
-
-    /**
-     * @return void
-     */
-    public function testGetAuthorizationUrl()
+    public function testGetAuthorizationUrl(): void
     {
         $url = $this->getProvider()->getAuthorizationUrl();
         $uri = parse_url($url);
@@ -51,7 +30,7 @@ class BookingsyncTest extends TestCase
         $this->assertNotNull($this->getProvider()->getState());
     }
 
-    public function testGetBaseAuthorizationUrl()
+    public function testGetBaseAuthorizationUrl(): void
     {
         $url = $this->getProvider()->getBaseAuthorizationUrl();
         $uri = parse_url($url);
@@ -59,7 +38,7 @@ class BookingsyncTest extends TestCase
         $this->assertEquals('/oauth/authorize', $uri['path']);
     }
 
-    public function testGetBaseAccessTokenUrl()
+    public function testGetBaseAccessTokenUrl(): void
     {
         $url = $this->getProvider()->getBaseAccessTokenUrl();
         $uri = parse_url($url);
@@ -67,13 +46,13 @@ class BookingsyncTest extends TestCase
         $this->assertEquals('/oauth/token', $uri['path']);
     }
 
-    public function testGetResourceOwnerDetailsUrl()
+    public function testGetResourceOwnerDetailsUrl(): void
     {
         $accessTokenBody = [
-            "access_token" => "mock_access_token",
-            "expires" => 3600,
-            "refresh_token" => "mock_refresh_token",
-            "uid" => 1
+            'access_token' => 'mock_access_token',
+            'expires' => 3600,
+            'refresh_token' => 'mock_refresh_token',
+            'uid' => 1,
         ];
 
         $response = m::mock(ResponseInterface::class);
@@ -94,13 +73,13 @@ class BookingsyncTest extends TestCase
         $this->assertEquals('/api/v3/accounts/1', $uri['path']);
     }
 
-    public function testGetAccessToken()
+    public function testGetAccessToken(): void
     {
         $accessTokenBody = [
-            "access_token" => "mock_access_token",
-            "expires" => 3600,
-            "refresh_token" => "mock_refresh_token",
-            "uid" => 1
+            'access_token' => 'mock_access_token',
+            'expires' => 3600,
+            'refresh_token' => 'mock_refresh_token',
+            'uid' => 1,
         ];
 
         $response = m::mock(ResponseInterface::class);
@@ -123,14 +102,14 @@ class BookingsyncTest extends TestCase
         $this->assertEquals('1', $token->getResourceOwnerId());
     }
 
-    public function testUserData()
+    public function testUserData(): void
     {
         $accessTokenBody = [
-            "access_token" => "mock_access_token",
-            "token_type" => "Bearer",
-            "expires" => 3600,
-            "refresh_token" => "mock_refresh_token",
-            "scope" => "scope1 scope2"
+            'access_token' => 'mock_access_token',
+            'token_type' => 'Bearer',
+            'expires' => 3600,
+            'refresh_token' => 'mock_refresh_token',
+            'scope' => 'scope1 scope2',
         ];
 
         $postResponse = m::mock(ResponseInterface::class);
@@ -139,12 +118,12 @@ class BookingsyncTest extends TestCase
         $postResponse->shouldReceive('getBody')->times(1)->andReturn(json_encode($accessTokenBody));
 
         $accountBody = [
-            "accounts" => [[
-                "id" => "mock_id",
-                "business_name" => "mock_business_name",
-                "email" => "mock_email",
-                "status" => "mock_status"
-            ]]
+            'accounts' => [[
+                'id' => 12,
+                'business_name' => 'mock_business_name',
+                'email' => 'mock_email',
+                'status' => 'mock_status',
+            ]],
         ];
 
         $getResponse = m::mock(ResponseInterface::class);
@@ -162,21 +141,21 @@ class BookingsyncTest extends TestCase
         $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
         $user = $this->getProvider()->getResourceOwner($token);
 
-        $this->assertEquals('mock_id', $user->getId());
+        $this->assertEquals(12, $user->getId());
         $this->assertEquals('mock_business_name', $user->getBusinessName());
         $this->assertEquals('mock_email', $user->getEmail());
         $this->assertEquals('mock_status', $user->getStatus());
         $this->assertSame($token, $user->getAccessToken());
-        $this->assertTrue(is_array($user->toArray()));
+        $this->assertIsArray($user->toArray());
     }
 
-    public function testUserDataFails()
+    public function testUserDataFails(): void
     {
         $errorBodies = [[
-            "error" => "mock_error",
-            "error_description" => "mock_error_description"
+            'error' => 'mock_error',
+            'error_description' => 'mock_error_description',
         ], [
-            "error" => ["message" => "mock_error"], "error_description" => "mock_error_description"
+            'error' => ['message' => 'mock_error'], 'error_description' => 'mock_error_description',
         ]];
 
         $testPayload = function ($payload) {
@@ -201,6 +180,7 @@ class BookingsyncTest extends TestCase
 
             try {
                 $this->getProvider()->getResourceOwner($token);
+
                 return false;
             } catch (\Exception $e) {
                 $this->assertInstanceOf(IdentityProviderException::class, $e);
@@ -210,5 +190,18 @@ class BookingsyncTest extends TestCase
         };
 
         $this->assertCount(2, array_filter(array_map($testPayload, $errorBodies)));
+    }
+
+    private function getProvider(): BookingSyncProvider
+    {
+        if (isset($this->provider)) {
+            return $this->provider;
+        }
+
+        return $this->provider = new BookingSyncProvider([
+            'clientId' => 'mock_client_id',
+            'clientSecret' => 'mock_secret',
+            'redirectUri' => 'none',
+        ]);
     }
 }
