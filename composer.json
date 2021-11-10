@@ -33,7 +33,8 @@
         "mockery/mockery": "~1.3",
         "phpunit/phpunit": "^9.5",
         "php-parallel-lint/php-parallel-lint": "^1.3",
-        "elodgy/coding-standard": "^1.0"
+        "elodgy/coding-standard": "^1.0",
+        "phpstan/phpstan": "^1.1"
     },
     "autoload": {
         "psr-4": {
