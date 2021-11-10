@@ -18,12 +18,12 @@ composer require bookingsync/oauth2-bookingsync-php
 
 ## Usage
 
-Usage is the same as The League's OAuth client, using `\Bookingsync\OAuth2\Client\Provider\Bookingsync` as the provider.
+Usage is the same as The League's OAuth client, using `\Bookingsync\OAuth2\Client\Provider\BookingSyncProvider` as the provider.
 
 ### Authorization Code Flow
 
 ```php
-$provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
+$provider = new \Bookingsync\OAuth2\Client\Provider\BookingSyncProvider([
     'clientId'          => 'XXXXXXXX',
     'clientSecret'      => 'XXXXXXXX',
     'redirectUri'       => 'https://www.example.com/callback-url', // https is mandatory for BookingSync
@@ -75,7 +75,7 @@ if (! isset($_GET['code'])) {
 ### Refreshing a Token
 
 ```php
-$provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
+$provider = new \Bookingsync\OAuth2\Client\Provider\BookingSyncProvider([
     'clientId'          => '{bookingsync-client-id}',
     'clientSecret'      => '{bookingsync-client-secret}',
     'redirectUri'       => 'https://example.com/callback-url'
@@ -90,7 +90,7 @@ if ($existingAccessToken->hasExpired()) {
 ```
 ### Client Credentials
 ```php
-$provider = new \Bookingsync\OAuth2\Client\Provider\Bookingsync([
+$provider = new \Bookingsync\OAuth2\Client\Provider\BookingSyncProvider([
     'clientId'          => '{bookingsync-client-id}',
     'clientSecret'      => '{bookingsync-client-secret}',
     'redirectUri'       => 'https://example.com/callback-url'
