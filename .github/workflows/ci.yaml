@@ -49,6 +49,9 @@ jobs:
       - name: Validate composer.json and composer.lock
         run: 'composer validate --verbose --strict --no-interaction --ansi'
 
+      - name: PHPStan test
+        run: 'vendor/bin/phpstan analyse --no-progress --no-interaction --verbose --ansi'
+
       - name: ECS check
         run: 'vendor/bin/ecs check src --no-progress-bar --no-interaction --verbose --ansi'
 
