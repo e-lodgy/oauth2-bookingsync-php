@@ -32,6 +32,8 @@ jobs:
           php-version: ${{ matrix.php }}
           tools: symfony
           coverage: xdebug
+        env:
+          COMPOSER_TOKEN: ${{ secrets.PAT }}
 
       - name: Install dependencies
         id: composer-update
