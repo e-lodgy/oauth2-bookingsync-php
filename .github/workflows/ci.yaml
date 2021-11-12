@@ -33,9 +33,6 @@ jobs:
           tools: symfony
           coverage: xdebug
 
-      - name: Setup composer
-        run: 'composer config -g github-oauth.github.com ${{ secrets.PAT }} --verbose --no-interaction --ansi'
-
       - name: Install dependencies
         id: composer-update
         run: 'composer update --no-interaction --no-progress --prefer-dist --ansi --verbose --no-scripts'
