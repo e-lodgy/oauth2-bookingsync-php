@@ -19,6 +19,9 @@ jobs:
 
     name: PHP ${{ matrix.php }}
 
+    env:
+      COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{secrets.PAT}}"}}' 
+
     steps:
 
       # --- ⚙️ Setup ⚙️ ----------
