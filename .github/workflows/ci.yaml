@@ -33,7 +33,7 @@ jobs:
           tools: symfony
           coverage: xdebug
         env:
-          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMPOSER_TOKEN: ${{ secrets.PAT }}
 
       - name: Install dependencies
         id: composer-update
