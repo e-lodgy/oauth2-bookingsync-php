@@ -8,6 +8,7 @@ use Bookingsync\OAuth2\Client\Exception\BookingSyncIdentityProviderException;
 use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
 use Bookingsync\OAuth2\Client\Provider\BookingSyncResourceOwner;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Psr7\Response;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -388,6 +389,23 @@ class BookingSyncTest extends TestCase
             'clientSecret' => 'mock_secret',
             'redirectUri' => 'none',
         ]);
+    }
+
+    public function testStringBody(): void
+    {
+        $this->expectException(BookingSyncIdentityProviderException::class);
+        $this->expectExceptionCode(200);
+        $this->expectExceptionMessage('mock_string');
+
+        $provider = $this->getProvider();
+        $response = m::mock(ResponseInterface::class);
+        $response->shouldReceive('getStatusCode')->times(1)->andReturn(200);
+        $response->shouldReceive('getBody')->times(4)->andReturn('mock_string');
+
+        $reflectionClass = new \ReflectionClass($provider);
+        $reflectionMethod = $reflectionClass->getMethod('checkResponse');
+        $reflectionMethod->setAccessible(true);
+        $reflectionMethod->invoke($provider, $response, 'mock_string');
     }
 
     public function accountBodyProvider(): array

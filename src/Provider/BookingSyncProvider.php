@@ -47,7 +47,9 @@ class BookingSyncProvider extends AbstractProvider
 
     protected function checkResponse(ResponseInterface $response, $data): void
     {
-        if ($response->getStatusCode() >= 400 && ! isset($data['errors'])) {
+        if (! is_array($data)) {
+            $message = $data;
+        } elseif ($response->getStatusCode() >= 400 && ! isset($data['errors'])) {
             $message = $response->getReasonPhrase();
         } elseif (isset($data['errors'])) {
             $message = $this->formatErrors($data['errors']);
