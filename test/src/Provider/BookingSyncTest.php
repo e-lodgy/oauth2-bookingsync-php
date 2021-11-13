@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bookingsync\OAuth2\Client\Test\Provider;
 
+use Bookingsync\OAuth2\Client\Exception\BookingSyncIdentityProviderException;
 use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
 use GuzzleHttp\ClientInterface;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -192,6 +193,109 @@ class BookingSyncTest extends TestCase
         $this->assertCount(2, array_filter(array_map($testPayload, $errorBodies)));
     }
 
+    public function testHttpErrorWithMessage(): void
+    {
+        $this->expectException(BookingSyncIdentityProviderException::class);
+        $this->expectExceptionCode(401);
+        $this->expectExceptionMessage('code: unauthorized');
+
+        $body = [
+            'errors' => [[
+                'code' => 'unauthorized',
+            ]],
+        ];
+
+        $getResponse = m::mock(ResponseInterface::class);
+        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(401);
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($body));
+        $getResponse->shouldReceive('getReasonPhrase')->times(1)->andReturn('Unauthorized');
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('setBaseUrl')->times(5);
+        $client->shouldReceive('setDefaultOption')->times(4);
+        $client->shouldReceive('send')->times(4)->andReturn($getResponse);
+        $this->getProvider()->setHttpClient($client);
+
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        $this->getProvider()->getResourceOwner($token);
+    }
+
+    public function testErrorWithoutHttpError(): void
+    {
+        $this->expectException(BookingSyncIdentityProviderException::class);
+        $this->expectExceptionCode(422);
+        $this->expectExceptionMessage('code: validation_failed, field: start_at, title: is within a used period');
+        $this->expectExceptionMessage('code: validation_failed, field: end_at, title: is within a used period');
+        $this->expectExceptionMessage("code: validation_failed, field: status, title: can't be blank. Set either booked, tentative_expires_at or unavailable attributes");
+
+        $body = [
+            'errors' => [
+                [
+                    'code' => 'validation_failed',
+                    'field' => 'start_at',
+                    'title' => 'is within a used period',
+                ],
+                [
+                    'code' => 'validation_failed',
+                    'field' => 'end_at',
+                    'title' => 'is within a used period',
+                ],
+                [
+                    'code' => 'validation_failed',
+                    'field' => 'status',
+                    'title' => "can't be blank. Set either booked, tentative_expires_at or unavailable attributes",
+                ],
+            ],
+        ];
+
+        $getResponse = m::mock(ResponseInterface::class);
+        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(422);
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($body));
+        $getResponse->shouldReceive('getReasonPhrase')->times(1)->andReturn('Unprocessable entity');
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('setBaseUrl')->times(5);
+        $client->shouldReceive('setDefaultOption')->times(4);
+        $client->shouldReceive('send')->times(4)->andReturn($getResponse);
+        $this->getProvider()->setHttpClient($client);
+
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        $this->getProvider()->getResourceOwner($token);
+    }
+
+    public function testErrorWithStringInsteadOfJsonBody(): void
+    {
+        $this->expectException(BookingSyncIdentityProviderException::class);
+        $this->expectExceptionCode(200);
+        $this->expectExceptionMessage('random_parameter: {"random_parameter":"mock_parameter"}');
+
+        $body = [
+            'errors' => [[
+                'random_parameter' => [
+                    'random_parameter' => 'mock_parameter',
+                ],
+            ]],
+        ];
+
+        $getResponse = m::mock(ResponseInterface::class);
+        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($body));
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('setBaseUrl')->times(5);
+        $client->shouldReceive('setDefaultOption')->times(4);
+        $client->shouldReceive('send')->times(4)->andReturn($getResponse);
+        $this->getProvider()->setHttpClient($client);
+
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        $this->getProvider()->getResourceOwner($token);
+    }
 
     /**
      * @dataProvider accountBodyProvider

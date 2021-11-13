@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bookingsync\OAuth2\Client\Provider;
 
+use Bookingsync\OAuth2\Client\Exception\BookingSyncIdentityProviderException;
 use League\OAuth2\Client\Provider\AbstractProvider;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
@@ -71,9 +71,18 @@ class BookingSyncProvider extends AbstractProvider
      */
     protected function checkResponse(ResponseInterface $response, $data): void
     {
-        if ($response->getStatusCode() >= 400) {
-            $message = is_string($data) ? $data : (json_encode($data) ?: $response->getReasonPhrase());
-            throw new IdentityProviderException($message, $response->getStatusCode(), $data);
+        if ($response->getStatusCode() >= 400 && ! isset($data['errors'])) {
+            $message = $response->getReasonPhrase();
+        } elseif (isset($data['errors'])) {
+            $message = $this->formatErrors($data['errors']);
+        }
+
+        if (isset($message)) {
+            throw new BookingSyncIdentityProviderException(
+                $message,
+                $response->getStatusCode(),
+                (string) $response->getBody()
+            );
         }
     }
 
@@ -98,5 +107,23 @@ class BookingSyncProvider extends AbstractProvider
 
         return new BookingSyncResourceOwner($response['accounts'][0] ?? [], $token);
     }
+
+    private function formatErrors(array $errors): string
+    {
+        $messages = [];
+        foreach ($errors as $error) {
+            $message = [];
+            foreach ($error as $key => $messageValue) {
+                if (! is_string($messageValue)) {
+                    $messageValue = json_encode($messageValue) ?: '[Provider] Cannot resolve errors...';
+                }
+
+                $message[] = sprintf('%s: %s', (string) $key, $messageValue);
+            }
+
+            $messages[] = implode(', ', $message);
+        }
+
+        return implode("\n", $messages);
     }
 }
