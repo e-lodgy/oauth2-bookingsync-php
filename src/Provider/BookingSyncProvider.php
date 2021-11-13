@@ -92,6 +92,11 @@ class BookingSyncProvider extends AbstractProvider
      */
     protected function createResourceOwner(array $response, AccessToken $token): ResourceOwnerInterface
     {
-        return new BookingSyncResourceOwner($response['accounts'][0], $token);
+        if (! array_key_exists('accounts', $response) || empty($response['accounts'])) {
+            throw new BookingSyncIdentityProviderException('Cannot found account', 0, $response);
+        }
+
+        return new BookingSyncResourceOwner($response['accounts'][0] ?? [], $token);
+    }
     }
 }

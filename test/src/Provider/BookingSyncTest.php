@@ -192,6 +192,46 @@ class BookingSyncTest extends TestCase
         $this->assertCount(2, array_filter(array_map($testPayload, $errorBodies)));
     }
 
+
+    /**
+     * @dataProvider accountBodyProvider
+     */
+    public function testMissingAccountInBody($accountBody): void
+    {
+        $this->expectException(BookingSyncIdentityProviderException::class);
+        $this->expectExceptionCode(0);
+        $this->expectExceptionMessage('Cannot found account');
+
+        $accessTokenBody = [
+            'access_token' => 'mock_access_token',
+            'token_type' => 'Bearer',
+            'expires' => 3600,
+            'refresh_token' => 'mock_refresh_token',
+            'scope' => 'scope1 scope2',
+        ];
+
+        $postResponse = m::mock(ResponseInterface::class);
+        $postResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $postResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
+        $postResponse->shouldReceive('getBody')->times(1)->andReturn(json_encode($accessTokenBody));
+
+        $getResponse = m::mock(ResponseInterface::class);
+        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($accountBody));
+
+        $client = m::mock(ClientInterface::class);
+        $client->shouldReceive('setBaseUrl')->times(5);
+        $client->shouldReceive('setDefaultOption')->times(4);
+        $client->shouldReceive('send')->times(1)->andReturn($postResponse);
+        $client->shouldReceive('send')->times(4)->andReturn($getResponse);
+        $this->getProvider()->setHttpClient($client);
+
+        $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        $this->getProvider()->getResourceOwner($token);
+    }
+
     private function getProvider(): BookingSyncProvider
     {
         if (isset($this->provider)) {
@@ -203,5 +243,13 @@ class BookingSyncTest extends TestCase
             'clientSecret' => 'mock_secret',
             'redirectUri' => 'none',
         ]);
+    }
+
+    public function accountBodyProvider(): array
+    {
+        return [
+            [[]],
+            ['account' => []],
+        ];
     }
 }
