@@ -28,7 +28,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     /**
      * Returns the identifier of the authorized resource owner.
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->response['id'];
     }
@@ -37,6 +37,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
      * Returns all the owner details available as an array.
      */
     public function toArray(): array
+    public function getEmail(): ?string
     {
         return $this->response;
     }
@@ -44,7 +45,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     /**
      * Returns the email of the authorized resource owner.
      */
-    public function getEmail(): string
+    public function getBusinessName(): ?string
     {
         return $this->response['email'];
     }
@@ -52,7 +53,7 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     /**
      * Returns the business name of the authorized resource owner.
      */
-    public function getBusinessName(): string
+    public function getStatus(): ?string
     {
         return $this->response['business_name'];
     }
@@ -60,7 +61,6 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     /**
      * Returns the status of the authorized resource owner.
      */
-    public function getStatus(): string
     {
         return $this->response['status'];
     }
