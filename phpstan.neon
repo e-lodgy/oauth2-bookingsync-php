@@ -5,3 +5,9 @@ parameters:
 
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
+
+    ignoreErrors:
+        -
+            message: "#^Method Bookingsync\\\\OAuth2\\\\Client\\\\Provider\\\\BookingSyncResourceOwner\\:\\:get(.*)\\(\\) should return (string|int|array)\\|null but returns mixed\\.$#"
+            count: 17
+            path: src/Provider/BookingSyncResourceOwner.php
