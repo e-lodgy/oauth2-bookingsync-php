@@ -6,6 +6,7 @@ namespace Bookingsync\OAuth2\Client\Test\Provider;
 
 use Bookingsync\OAuth2\Client\Exception\BookingSyncIdentityProviderException;
 use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
+use Bookingsync\OAuth2\Client\Provider\BookingSyncResourceOwner;
 use GuzzleHttp\ClientInterface;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mockery as m;
@@ -124,6 +125,31 @@ class BookingSyncTest extends TestCase
                 'business_name' => 'mock_business_name',
                 'email' => 'mock_email',
                 'status' => 'mock_status',
+                'created_at' => '2020-02-11T10:50:09Z',
+                'updated_at' => '2021-05-06T13:25:40Z',
+                'address1' => 'mock_address1',
+                'address2' => 'mock_address2',
+                'city' => 'mock_city',
+                'zip' => 'mock_zip',
+                'state' => 'mock_state',
+                'country_code' => 'mock_country_code',
+                'website' => 'mock_website',
+                'default_locale' => 'en',
+                'selected_locales' => [
+                    'en'
+                ],
+                'preferences' => [
+                    'bookings' => [
+                        'default_arrival_time' => 16,
+                        'default_departure_time' => 10,
+                        'default_communication_locale' => 'en',
+                    ],
+                ],
+                'phones' => [
+                    'phone' => 'mock_phone',
+                    'mobile' => 'mock_mobile',
+                    'fax' => 'mock_fax'
+                ],
             ]],
         ];
 
@@ -140,12 +166,27 @@ class BookingSyncTest extends TestCase
         $this->getProvider()->setHttpClient($client);
 
         $token = $this->getProvider()->getAccessToken('authorization_code', ['code' => 'mock_authorization_code']);
+
+        /** @var BookingSyncResourceOwner $user */
         $user = $this->getProvider()->getResourceOwner($token);
 
         $this->assertEquals(12, $user->getId());
         $this->assertEquals('mock_business_name', $user->getBusinessName());
         $this->assertEquals('mock_email', $user->getEmail());
         $this->assertEquals('mock_status', $user->getStatus());
+        $this->assertEquals('2020-02-11T10:50:09Z', $user->getCreatedAt());
+        $this->assertEquals('2021-05-06T13:25:40Z', $user->getUpdatedAt());
+        $this->assertEquals('mock_address1', $user->getAddress1());
+        $this->assertEquals('mock_address2', $user->getAddress2());
+        $this->assertEquals('mock_city', $user->getCity());
+        $this->assertEquals('mock_zip', $user->getZip());
+        $this->assertEquals('mock_state', $user->getState());
+        $this->assertEquals('mock_country_code', $user->getCountryCode());
+        $this->assertEquals('mock_website', $user->getWebsite());
+        $this->assertEquals('en', $user->getDefaultLocale());
+        $this->assertEquals(['en'], $user->getSelectedLocales());
+        $this->assertEquals(['bookings' => ['default_arrival_time' => 16, 'default_departure_time' => 10, 'default_communication_locale' => 'en']], $user->getPreferences());
+        $this->assertEquals(['phone' => 'mock_phone', 'mobile' => 'mock_mobile', 'fax' => 'mock_fax'], $user->getPhones());
         $this->assertSame($token, $user->getAccessToken());
         $this->assertIsArray($user->toArray());
     }

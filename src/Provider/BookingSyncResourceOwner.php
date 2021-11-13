@@ -61,8 +61,109 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
     }
 
     /**
+     * Returns the address1 of the authorized resource owner.
      */
+    public function getAddress1(): ?string
     {
+        return $this->getValueByKey($this->response, 'address1');
+    }
+
+    /**
+     * Returns the address2 of the authorized resource owner.
+     */
+    public function getAddress2(): ?string
+    {
+        return $this->getValueByKey($this->response, 'address2');
+    }
+
+    /**
+     * Returns the city of the authorized resource owner.
+     */
+    public function getCity(): ?string
+    {
+        return $this->getValueByKey($this->response, 'city');
+    }
+
+    /**
+     * Returns the zip of the authorized resource owner.
+     */
+    public function getZip(): ?string
+    {
+        return $this->getValueByKey($this->response, 'zip');
+    }
+
+    /**
+     * Returns the state of the authorized resource owner.
+     */
+    public function getState(): ?string
+    {
+        return $this->getValueByKey($this->response, 'state');
+    }
+
+    /**
+     * Returns the country code of the authorized resource owner.
+     */
+    public function getCountryCode(): ?string
+    {
+        return $this->getValueByKey($this->response, 'country_code');
+    }
+
+    /**
+     * Returns the default locale of the authorized resource owner.
+     */
+    public function getDefaultLocale(): ?string
+    {
+        return $this->getValueByKey($this->response, 'default_locale');
+    }
+
+    /**
+     * Returns the selected locales of the authorized resource owner.
+     */
+    public function getSelectedLocales(): ?array
+    {
+        return $this->getValueByKey($this->response, 'selected_locales');
+    }
+
+    /**
+     * Returns the website of the authorized resource owner.
+     */
+    public function getWebsite(): ?string
+    {
+        return $this->getValueByKey($this->response, 'website');
+    }
+
+    /**
+     * Returns the created time of the authorized resource owner.
+     */
+    public function getCreatedAt(): ?string
+    {
+        return $this->getValueByKey($this->response, 'created_at');
+    }
+
+    /**
+     * Returns the updated time of the authorized resource owner.
+     */
+    public function getUpdatedAt(): ?string
+    {
+        return $this->getValueByKey($this->response, 'updated_at');
+    }
+
+    /**
+     * Returns the phones of the authorized resource owner.
+     */
+    public function getPhones(): ?array
+    {
+        return $this->getValueByKey($this->response, 'phones');
+    }
+
+    /**
+     * Returns the preferences of the authorized resource owner.
+     */
+    public function getPreferences(): ?array
+    {
+        return $this->getValueByKey($this->response, 'preferences');
+    }
+
     /**
      * Returns all the owner details available as an array.
      */
