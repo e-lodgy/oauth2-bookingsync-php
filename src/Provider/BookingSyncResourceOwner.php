@@ -6,9 +6,12 @@ namespace Bookingsync\OAuth2\Client\Provider;
 
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessTokenInterface;
+use League\OAuth2\Client\Tool\ArrayAccessorTrait;
 
 class BookingSyncResourceOwner implements ResourceOwnerInterface
 {
+    use ArrayAccessorTrait;
+
     /**
      * Raw response.
      */
@@ -30,39 +33,42 @@ class BookingSyncResourceOwner implements ResourceOwnerInterface
      */
     public function getId(): ?int
     {
-        return $this->response['id'];
-    }
-
-    /**
-     * Returns all the owner details available as an array.
-     */
-    public function toArray(): array
-    public function getEmail(): ?string
-    {
-        return $this->response;
+        return $this->getValueByKey($this->response, 'id');
     }
 
     /**
      * Returns the email of the authorized resource owner.
      */
-    public function getBusinessName(): ?string
+    public function getEmail(): ?string
     {
-        return $this->response['email'];
+        return $this->getValueByKey($this->response, 'email');
     }
 
     /**
      * Returns the business name of the authorized resource owner.
      */
-    public function getStatus(): ?string
+    public function getBusinessName(): ?string
     {
-        return $this->response['business_name'];
+        return $this->getValueByKey($this->response, 'business_name');
     }
 
     /**
      * Returns the status of the authorized resource owner.
      */
+    public function getStatus(): ?string
     {
-        return $this->response['status'];
+        return $this->getValueByKey($this->response, 'status');
+    }
+
+    /**
+     */
+    {
+    /**
+     * Returns all the owner details available as an array.
+     */
+    public function toArray(): array
+    {
+        return $this->response;
     }
 
     /**
