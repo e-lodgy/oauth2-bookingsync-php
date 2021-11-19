@@ -7,3 +7,4 @@
 /ecs.php
 /phpstan.neon export-ignore
 /phpunit.xml.dist export-ignore
+/renovate.json export-ignore
