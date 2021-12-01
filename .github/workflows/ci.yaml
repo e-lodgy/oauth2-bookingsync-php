@@ -39,25 +39,16 @@ jobs:
         id: composer-update
         run: 'composer update --no-interaction --no-progress --prefer-dist --ansi --verbose --no-scripts'
 
-      - name: Fail the test
-        if: steps.composer-update.outcome != 'success'
-        run: exit 1
-
       # --- 🛠 Test 🛠 ----------
-
-      - name: Validate renovate
-        uses: rinchsan/renovate-config-validator@v0.0.8
-        with:
-          pattern: 'renovate.json'
 
       - name: Validate composer.json and composer.lock
         run: 'composer validate --verbose --strict --no-interaction --ansi'
 
       - name: PHPStan test
-        run: 'vendor/bin/phpstan analyse --no-progress --no-interaction --verbose --ansi'
+        run: 'vendor/bin/phpstan analyse --no-progress --no-interaction --ansi'
 
       - name: ECS check
-        run: 'vendor/bin/ecs check src --no-progress-bar --no-interaction --verbose --ansi'
+        run: 'vendor/bin/ecs check src --no-progress-bar --no-interaction --ansi'
 
       - name: PHPUnit tests
         run: 'vendor/bin/phpunit --verbose --color=always --fail-on-risky --coverage-clover ./coverage.xml'
@@ -73,6 +64,3 @@ jobs:
           path: ~/.symfony/cache
           key: ${{ runner.os }}-php-${{ matrix.php }}
           restore-keys: ${{ runner.os }}-php-
-
-      - name: Check for security vulnerabilities
-        run: 'symfony security:check'
