@@ -21,7 +21,7 @@ class BookingSyncProvider extends AbstractProvider
 
     protected const BASE_AUTH_URL = 'https://www.bookingsync.com/oauth/authorize';
     protected const BASE_ACCESS_TOKEN_URL = 'https://www.bookingsync.com/oauth/token';
-    protected const BASE_RESOURCE_OWNER_DETAILS_URL = 'https://www.bookingsync.com/api/v3/accounts/';
+    protected const BASE_RESOURCE_OWNER_DETAILS_URL = 'https://www.bookingsync.com/api/v3/accounts';
 
     public function getBaseAuthorizationUrl(): string
     {
@@ -37,7 +37,7 @@ class BookingSyncProvider extends AbstractProvider
     {
         $id = $token instanceof ResourceOwnerAccessTokenInterface ? $token->getResourceOwnerId() : null;
 
-        return self::BASE_RESOURCE_OWNER_DETAILS_URL . $id;
+        return self::BASE_RESOURCE_OWNER_DETAILS_URL . "/$id";
     }
 
     protected function getDefaultScopes(): array
