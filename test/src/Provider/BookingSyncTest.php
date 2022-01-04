@@ -55,7 +55,6 @@ class BookingSyncTest extends TestCase
             'access_token' => 'mock_access_token',
             'expires' => 3600,
             'refresh_token' => 'mock_refresh_token',
-            'uid' => 1,
         ];
 
         $response = m::mock(ResponseInterface::class);
@@ -73,7 +72,7 @@ class BookingSyncTest extends TestCase
 
         $uri = parse_url($url);
 
-        $this->assertEquals('/api/v3/accounts/1', $uri['path']);
+        $this->assertEquals('/api/v3/accounts', $uri['path']);
     }
 
     public function testGetAccessToken(): void
@@ -82,7 +81,6 @@ class BookingSyncTest extends TestCase
             'access_token' => 'mock_access_token',
             'expires' => 3600,
             'refresh_token' => 'mock_refresh_token',
-            'uid' => 1,
         ];
 
         $response = m::mock(ResponseInterface::class);
@@ -102,7 +100,6 @@ class BookingSyncTest extends TestCase
         $this->assertFalse($token->hasExpired());
         $this->assertGreaterThanOrEqual(time(), $token->getExpires());
         $this->assertEquals('mock_refresh_token', $token->getRefreshToken());
-        $this->assertEquals('1', $token->getResourceOwnerId());
     }
 
     public function testUserData(): void
