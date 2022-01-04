@@ -9,7 +9,6 @@ use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
 use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
-use League\OAuth2\Client\Token\ResourceOwnerAccessTokenInterface;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
 
@@ -35,9 +34,7 @@ class BookingSyncProvider extends AbstractProvider
 
     public function getResourceOwnerDetailsUrl(AccessTokenInterface $token): string
     {
-        $id = $token instanceof ResourceOwnerAccessTokenInterface ? $token->getResourceOwnerId() : null;
-
-        return self::BASE_RESOURCE_OWNER_DETAILS_URL . "/$id";
+        return self::BASE_RESOURCE_OWNER_DETAILS_URL;
     }
 
     protected function getDefaultScopes(): array
