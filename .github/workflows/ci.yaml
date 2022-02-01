@@ -49,7 +49,7 @@ jobs:
         run: 'vendor/bin/phpstan analyse --no-progress --no-interaction --ansi'
 
       - name: ECS check
-        run: 'vendor/bin/ecs check src --no-progress-bar --no-interaction --ansi'
+        run: 'vendor/bin/ecs check src ecs.php --no-progress-bar --no-interaction --ansi'
 
       - name: PHPUnit tests
         run: 'vendor/bin/phpunit --verbose --color=always --fail-on-risky --coverage-clover ./coverage.xml'
