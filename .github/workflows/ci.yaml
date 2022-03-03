@@ -36,13 +36,25 @@ jobs:
         env:
           COMPOSER_TOKEN: ${{ secrets.PAT }}
 
+      - name: 'Get Composer cache directory'
+        id: composer-cache
+        run: 'echo "::set-output name=dir::$(composer config cache-files-dir)"'
+
+      - name: 'Cache Composer'
+        uses: actions/cache@v2
+        with:
+          path: '${{ steps.composer-cache.outputs.dir }}'
+          key: "${{ runner.os }}-php-${{ matrix.php }}-composer-${{ hashFiles('**/composer.json') }}"
+          restore-keys: |
+            ${{ runner.os }}-php-${{ matrix.php }}-composer-
+            ${{ runner.os }}-php-
+
       - name: Install dependencies
-        id: composer-update
         run: 'composer update --no-interaction --no-progress --prefer-dist --ansi --verbose --no-scripts'
 
       # --- 🛠 Test 🛠 ----------
 
-      - name: Validate composer.json and composer.lock
+      - name: Validate composer.json
         run: 'composer validate --verbose --strict --no-interaction --ansi'
 
       - name: PHPStan test
@@ -59,9 +71,3 @@ jobs:
         with:
           percentage: "100"
           filename: "coverage.xml"
-
-      - uses: actions/cache@v2
-        with:
-          path: ~/.symfony/cache
-          key: ${{ runner.os }}-php-${{ matrix.php }}
-          restore-keys: ${{ runner.os }}-php-
