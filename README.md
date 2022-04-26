@@ -23,7 +23,10 @@ Usage is the same as The League's OAuth client, using `\Bookingsync\OAuth2\Clien
 ### Authorization Code Flow
 
 ```php
-$provider = new \Bookingsync\OAuth2\Client\Provider\BookingSyncProvider([
+use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+
+$provider = new BookingSyncProvider([
     'clientId'          => 'XXXXXXXX',
     'clientSecret'      => 'XXXXXXXX',
     'redirectUri'       => 'https://www.example.com/callback-url', // https is mandatory for BookingSync
@@ -56,7 +59,7 @@ if (! isset($_GET['code'])) {
         // Use these details to create a new profile
         printf('Hello %s!', $resourceOwner->getBusinessName());
 
-    } catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+    } catch (IdentityProviderException $e) {
         // Failed to get user details
         exit($e->getMessage());
     }
@@ -75,32 +78,41 @@ if (! isset($_GET['code'])) {
 ### Refreshing a Token
 
 ```php
-$provider = new \Bookingsync\OAuth2\Client\Provider\BookingSyncProvider([
-    'clientId'          => '{bookingsync-client-id}',
-    'clientSecret'      => '{bookingsync-client-secret}',
+use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
+use League\OAuth2\Client\Grant\RefreshToken;
+use League\OAuth2\Client\Token\AccessTokenInterface;
+
+$provider = new BookingSyncProvider([
+    'clientId'          => 'XXXXXXXX',
+    'clientSecret'      => 'XXXXXXXX',
     'redirectUri'       => 'https://example.com/callback-url'
 ]);
 
+/** @var AccessTokenInterface $existingAccessToken */
 $existingAccessToken = getAccessTokenFromYourDataStore();
 
 if ($existingAccessToken->hasExpired()) {
-    $grant = new \League\OAuth2\Client\Grant\RefreshToken();
+    $grant = new RefreshToken();
     $token = $provider->getAccessToken($grant, ['refresh_token' => $existingAccessToken->getRefreshToken()]);
 }
 ```
 ### Client Credentials
 ```php
-$provider = new \Bookingsync\OAuth2\Client\Provider\BookingSyncProvider([
-    'clientId'          => '{bookingsync-client-id}',
-    'clientSecret'      => '{bookingsync-client-secret}',
+use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
+use League\OAuth2\Client\Grant\ClientCredentials;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+
+$provider = new BookingSyncProvider([
+    'clientId'          => 'XXXXXXXX',
+    'clientSecret'      => 'XXXXXXXX',
     'redirectUri'       => 'https://example.com/callback-url'
 ]);
 
 try {
     // Try to get an access token using the client credentials grant.
-    $grant = new \League\OAuth2\Client\Grant\ClientCredentials();
+    $grant = new ClientCredentials();
     $accessToken = $provider->getAccessToken($grant);
-} catch (\League\OAuth2\Client\Provider\Exception\IdentityProviderException $e) {
+} catch (IdentityProviderException $e) {
     // Failed to get the access token
     exit($e->getMessage());
 }
