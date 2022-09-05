@@ -1,5 +1,5 @@
 {
-    "name": "bookingsync/oauth2-bookingsync-php",
+    "name": "e-lodgy/oauth2-bookingsync-php",
     "description": "BookingSync OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
     "license": "MIT",
     "authors": [
@@ -11,7 +11,6 @@
         },
         {
             "name": "Benjamin Malgras",
-            "email": "benjamin.malgras@outlook.fr",
             "homepage": "https://github.com/benjaminmal",
             "role": "Developer"
         }
@@ -33,7 +32,7 @@
         "mockery/mockery": "~1.3",
         "phpunit/phpunit": "^9.5",
         "php-parallel-lint/php-parallel-lint": "^1.3",
-        "elodgy/coding-standard": "^1.0",
+        "e-lodgy/coding-standard": "^1.0",
         "phpstan/phpstan": "^1.1"
     },
     "autoload": {
