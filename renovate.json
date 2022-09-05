@@ -1,5 +1,5 @@
 {
   "extends": [
-    "github>benjaminmal/renovate-config:library"
+    "github>e-lodgy/renovate-config:library"
   ]
 }
