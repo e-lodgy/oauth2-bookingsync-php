@@ -7,7 +7,6 @@ namespace Bookingsync\OAuth2\Client\Provider;
 use Bookingsync\OAuth2\Client\Exception\BookingSyncIdentityProviderException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\ResourceOwnerInterface;
-use League\OAuth2\Client\Token\AccessToken;
 use League\OAuth2\Client\Token\AccessTokenInterface;
 use League\OAuth2\Client\Tool\BearerAuthorizationTrait;
 use Psr\Http\Message\ResponseInterface;
@@ -66,7 +65,7 @@ class BookingSyncProvider extends AbstractProvider
         return ' ';
     }
 
-    protected function createResourceOwner(array $response, AccessToken $token): ResourceOwnerInterface
+    protected function createResourceOwner(array $response, AccessTokenInterface $token): ResourceOwnerInterface
     {
         if (! array_key_exists('accounts', $response) || empty($response['accounts'])) {
             throw new BookingSyncIdentityProviderException('Cannot found account', 0, $response);
