@@ -58,7 +58,7 @@ jobs:
                 run: composer validate --verbose --strict --no-interaction --ansi
 
             -   name: PHPStan test
-                run: vendor/bin/phpstan analyse --no-progress --no-interaction --ansi
+                run: vendor/bin/phpstan analyse --configuration=phpstan-ci.neon --no-progress --no-interaction --ansi
 
             -   name: ECS check
                 run: vendor/bin/ecs check src/ test/ ecs.php --no-progress-bar --no-interaction --ansi
