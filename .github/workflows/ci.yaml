@@ -54,6 +54,11 @@ jobs:
 
             # --- 🛠 Test 🛠 ----------
 
+            -   name: Validate renovate
+                uses: rinchsan/renovate-config-validator@v0.0.12
+                with:
+                  pattern: 'renovate.json'
+
             -   name: Validate composer.json
                 run: composer validate --verbose --strict --no-interaction --ansi
 
