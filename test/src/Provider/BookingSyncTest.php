@@ -8,7 +8,6 @@ use Bookingsync\OAuth2\Client\Exception\BookingSyncIdentityProviderException;
 use Bookingsync\OAuth2\Client\Provider\BookingSyncProvider;
 use Bookingsync\OAuth2\Client\Provider\BookingSyncResourceOwner;
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Psr7\Response;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -134,7 +133,7 @@ class BookingSyncTest extends TestCase
                 'website' => 'mock_website',
                 'default_locale' => 'en',
                 'selected_locales' => [
-                    'en'
+                    'en',
                 ],
                 'preferences' => [
                     'bookings' => [
@@ -146,7 +145,7 @@ class BookingSyncTest extends TestCase
                 'phones' => [
                     'phone' => 'mock_phone',
                     'mobile' => 'mock_mobile',
-                    'fax' => 'mock_fax'
+                    'fax' => 'mock_fax',
                 ],
             ]],
         ];
@@ -375,19 +374,6 @@ class BookingSyncTest extends TestCase
         $this->getProvider()->getResourceOwner($token);
     }
 
-    private function getProvider(): BookingSyncProvider
-    {
-        if (isset($this->provider)) {
-            return $this->provider;
-        }
-
-        return $this->provider = new BookingSyncProvider([
-            'clientId' => 'mock_client_id',
-            'clientSecret' => 'mock_secret',
-            'redirectUri' => 'none',
-        ]);
-    }
-
     public function testStringBody(): void
     {
         $this->expectException(BookingSyncIdentityProviderException::class);
@@ -411,5 +397,18 @@ class BookingSyncTest extends TestCase
             [[]],
             ['account' => []],
         ];
+    }
+
+    private function getProvider(): BookingSyncProvider
+    {
+        if (isset($this->provider)) {
+            return $this->provider;
+        }
+
+        return $this->provider = new BookingSyncProvider([
+            'clientId' => 'mock_client_id',
+            'clientSecret' => 'mock_secret',
+            'redirectUri' => 'none',
+        ]);
     }
 }
