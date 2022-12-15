@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
-return static function (ECSConfig $containerConfigurator): void {
-    $containerConfigurator->import('vendor/e-lodgy/coding-standard/ecs.php');
+return static function (ECSConfig $config): void {
+    $config->import('vendor/e-lodgy/coding-standard/ecs.php');
+    $config->paths([
+        __DIR__ . '/src/',
+        __DIR__ . '/test/',
+        __DIR__ . '/ecs.php',
+    ]);
 };
