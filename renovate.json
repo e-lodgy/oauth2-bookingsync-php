@@ -2,5 +2,5 @@
   "extends": [
     "github>e-lodgy/renovate-config:library"
   ],
-  "includeForks": true
+  "forkProcessing": "enabled"
 }
