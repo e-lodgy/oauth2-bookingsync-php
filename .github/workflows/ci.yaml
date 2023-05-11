@@ -31,8 +31,7 @@ jobs:
                 uses: shivammathur/setup-php@v2
                 with:
                     php-version: ${{ matrix.php }}
-                    tools: symfony
-                    coverage: xdebug
+                    coverage: pcov
                 env:
                     COMPOSER_TOKEN: ${{ secrets.PAT }}
 

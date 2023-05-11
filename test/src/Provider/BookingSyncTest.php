@@ -12,6 +12,7 @@ use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 
 class BookingSyncTest extends TestCase
 {
@@ -56,10 +57,13 @@ class BookingSyncTest extends TestCase
             'refresh_token' => 'mock_refresh_token',
         ];
 
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn(json_encode($accessTokenBody));
+
         $response = m::mock(ResponseInterface::class);
-        $response->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $response->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $response->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $response->shouldReceive('getBody')->times(1)->andReturn(json_encode($accessTokenBody));
+        $response->shouldReceive('getBody')->times(1)->andReturn($stream);
 
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(1);
@@ -82,10 +86,13 @@ class BookingSyncTest extends TestCase
             'refresh_token' => 'mock_refresh_token',
         ];
 
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn(json_encode($accessTokenBody));
+
         $response = m::mock(ResponseInterface::class);
-        $response->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $response->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $response->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $response->shouldReceive('getBody')->times(1)->andReturn(json_encode($accessTokenBody));
+        $response->shouldReceive('getBody')->times(1)->andReturn($stream);
 
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(1);
@@ -111,10 +118,13 @@ class BookingSyncTest extends TestCase
             'scope' => 'scope1 scope2',
         ];
 
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn(json_encode($accessTokenBody));
+
         $postResponse = m::mock(ResponseInterface::class);
-        $postResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $postResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $postResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $postResponse->shouldReceive('getBody')->times(1)->andReturn(json_encode($accessTokenBody));
+        $postResponse->shouldReceive('getBody')->times(1)->andReturn($stream);
 
         $accountBody = [
             'accounts' => [[
@@ -150,10 +160,13 @@ class BookingSyncTest extends TestCase
             ]],
         ];
 
+        $streamAccount = m::mock(StreamInterface::class);
+        $streamAccount->shouldReceive('__toString')->andReturn(json_encode($accountBody));
+
         $getResponse = m::mock(ResponseInterface::class);
-        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($accountBody));
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn($streamAccount);
 
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(5);
@@ -198,14 +211,20 @@ class BookingSyncTest extends TestCase
         ]];
 
         $testPayload = function ($payload) {
+            $streamPost = m::mock(StreamInterface::class);
+            $streamPost->shouldReceive('__toString')->andReturn('{"access_token": "mock_access_token","scopes": "account","expires_in": 3600,"refresh_token": "mock_refresh_token","token_type": "bearer"}');
+
             $postResponse = m::mock(ResponseInterface::class);
-            $postResponse->shouldReceive('getBody')->andReturn('{"access_token": "mock_access_token","scopes": "account","expires_in": 3600,"refresh_token": "mock_refresh_token","token_type": "bearer"}');
-            $postResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+            $postResponse->shouldReceive('getBody')->andReturn($streamPost);
+            $postResponse->shouldReceive('getHeader')->with('content-type')->andReturn(['application/json']);
             $postResponse->shouldReceive('getStatusCode')->andReturn(200);
 
+            $streamUser = m::mock(StreamInterface::class);
+            $streamUser->shouldReceive('__toString')->andReturn(json_encode($payload));
+
             $userResponse = m::mock(ResponseInterface::class);
-            $userResponse->shouldReceive('getBody')->andReturn(json_encode($payload));
-            $userResponse->shouldReceive('getHeader')->andReturn(['content-type' => 'json']);
+            $userResponse->shouldReceive('getBody')->andReturn($streamUser);
+            $userResponse->shouldReceive('getHeader')->with('content-type')->andReturn(['application/json']);
             $userResponse->shouldReceive('getStatusCode')->andReturn(500);
             $userResponse->shouldReceive('getReasonPhrase')->andReturn('Internal Server Error');
 
@@ -243,10 +262,13 @@ class BookingSyncTest extends TestCase
             ]],
         ];
 
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn(json_encode($body));
+
         $getResponse = m::mock(ResponseInterface::class);
-        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(401);
-        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($body));
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn($stream);
         $getResponse->shouldReceive('getReasonPhrase')->times(1)->andReturn('Unauthorized');
 
         $client = m::mock(ClientInterface::class);
@@ -288,10 +310,13 @@ class BookingSyncTest extends TestCase
             ],
         ];
 
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn(json_encode($body));
+
         $getResponse = m::mock(ResponseInterface::class);
-        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(422);
-        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($body));
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn($stream);
         $getResponse->shouldReceive('getReasonPhrase')->times(1)->andReturn('Unprocessable entity');
 
         $client = m::mock(ClientInterface::class);
@@ -319,10 +344,13 @@ class BookingSyncTest extends TestCase
             ]],
         ];
 
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn(json_encode($body));
+
         $getResponse = m::mock(ResponseInterface::class);
-        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($body));
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn($stream);
 
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(5);
@@ -352,15 +380,21 @@ class BookingSyncTest extends TestCase
             'scope' => 'scope1 scope2',
         ];
 
+        $streamPost = m::mock(StreamInterface::class);
+        $streamPost->shouldReceive('__toString')->andReturn(json_encode($accessTokenBody));
+
         $postResponse = m::mock(ResponseInterface::class);
-        $postResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $postResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $postResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $postResponse->shouldReceive('getBody')->times(1)->andReturn(json_encode($accessTokenBody));
+        $postResponse->shouldReceive('getBody')->times(1)->andReturn($streamPost);
+
+        $streamGet = m::mock(StreamInterface::class);
+        $streamGet->shouldReceive('__toString')->andReturn(json_encode($accountBody));
 
         $getResponse = m::mock(ResponseInterface::class);
-        $getResponse->shouldReceive('getHeader')->times(1)->andReturn('application/json');
+        $getResponse->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $getResponse->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $getResponse->shouldReceive('getBody')->times(4)->andReturn(json_encode($accountBody));
+        $getResponse->shouldReceive('getBody')->times(4)->andReturn($streamGet);
 
         $client = m::mock(ClientInterface::class);
         $client->shouldReceive('setBaseUrl')->times(5);
@@ -381,9 +415,14 @@ class BookingSyncTest extends TestCase
         $this->expectExceptionMessage('mock_string');
 
         $provider = $this->getProvider();
+
+        $stream = m::mock(StreamInterface::class);
+        $stream->shouldReceive('__toString')->andReturn('mock_string');
+
         $response = m::mock(ResponseInterface::class);
+        $response->shouldReceive('getHeader')->with('content-type')->times(1)->andReturn(['application/json']);
         $response->shouldReceive('getStatusCode')->times(1)->andReturn(200);
-        $response->shouldReceive('getBody')->times(4)->andReturn('mock_string');
+        $response->shouldReceive('getBody')->times(4)->andReturn($stream);
 
         $reflectionClass = new \ReflectionClass($provider);
         $reflectionMethod = $reflectionClass->getMethod('checkResponse');
