@@ -55,7 +55,7 @@ class BookingSyncProvider extends AbstractProvider
             throw new BookingSyncIdentityProviderException(
                 $message,
                 $response->getStatusCode(),
-                (string) $response->getBody()
+                (string) $response->getBody(),
             );
         }
     }
